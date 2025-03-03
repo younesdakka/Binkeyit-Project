@@ -4,10 +4,10 @@ const OrderModel = require("../models/order.model.js");
 const UserModel = require("../models/user.model.js");
 const mongoose = require("mongoose");
 
-const CashOnDeliveryOrderController =async (request,response)=>{
+const CashOnDeliveryOrderController =async (req,res)=>{
     try {
-        const userId = request.userId // auth middleware 
-        const { list_items, totalAmt, addressId,subTotalAmt } = request.body 
+        const userId = req.userId  
+        const { list_items, totalAmt, addressId,subTotalAmt } = req.body 
 
         const payload = list_items.map(el => {
             return({
@@ -28,11 +28,10 @@ const CashOnDeliveryOrderController =async (request,response)=>{
 
         const generatedOrder = await OrderModel.insertMany(payload)
 
-        ///remove from the cart
         const removeCartItems = await CartProductModel.deleteMany({ userId : userId })
         const updateInUser = await UserModel.updateOne({ _id : userId }, { shopping_cart : []})
 
-        return response.json({
+        return res.json({
             message : "Order successfully",
             error : false,
             success : true,
@@ -40,7 +39,7 @@ const CashOnDeliveryOrderController =async (request,response)=>{
         })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error ,
             error : true,
             success : false
@@ -52,10 +51,10 @@ const pricewithDiscount = (price,dis = 1)=>{
     const actualPrice = Number(price) - Number(discountAmout)
     return actualPrice
 }
-const paymentController =async(request,response)=>{
+const paymentController =async(req,res)=>{
     try {
-        const userId = request.userId // auth middleware 
-        const { list_items, totalAmt, addressId,subTotalAmt } = request.body 
+        const userId = req.userId  
+        const { list_items, totalAmt, addressId,subTotalAmt } = req.body 
 
         const user = await UserModel.findById(userId)
 
@@ -96,10 +95,10 @@ const paymentController =async(request,response)=>{
 
         const session = await Stripe.checkout.sessions.create(params)
 
-        return response.status(200).json(session)
+        return res.status(200).json(session)
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -143,14 +142,12 @@ const getOrderProductItems = async({
     return productList
 }
 
-//http://localhost:8080/api/order/webhook
-const webhookStripe= async(request,response)=>{
-    const event = request.body;
+const webhookStripe= async(req,res)=>{
+    const event = req.body;
     const endPointSecret = process.env.STRIPE_ENPOINT_WEBHOOK_SECRET_KEY
 
     console.log("event",event)
 
-    // Handle the event
   switch (event.type) {
     case 'checkout.session.completed':
       const session = event.data.object;
@@ -179,24 +176,23 @@ const webhookStripe= async(request,response)=>{
       console.log(`Unhandled event type ${event.type}`);
   }
 
-  // Return a response to acknowledge receipt of the event
-  response.json({received: true});
+  res.json({received: true});
 }
 
-const getOrderDetailsController = async(request,response)=>{
+const getOrderDetailsController = async(req,res)=>{
     try {
-        const userId = request.userId // order id
+        const userId = req.userId 
 
         const orderlist = await OrderModel.find({ userId : userId }).sort({ createdAt : -1 }).populate('delivery_address')
 
-        return response.json({
+        return res.json({
             message : "order list",
             data : orderlist,
             error : false,
             success : true
         })
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false

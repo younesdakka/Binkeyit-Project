@@ -1,12 +1,12 @@
 
 const SubCategoryModel = require("../models/subCategory.model")
 
-const AddSubCategoryController = async(request,response)=>{
+const AddSubCategoryController = async(req,res)=>{
     try {
-        const { name, image, category } = request.body 
+        const { name, image, category } = req.body 
 
         if(!name && !image && !category[0] ){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "Provide name, image, category",
                 error : true,
                 success : false
@@ -22,7 +22,7 @@ const AddSubCategoryController = async(request,response)=>{
         const createSubCategory = new SubCategoryModel(payload)
         const save = await createSubCategory.save()
 
-        return response.json({
+        return res.json({
             message : "Sub Category Created",
             data : save,
             error : false,
@@ -30,7 +30,7 @@ const AddSubCategoryController = async(request,response)=>{
         })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -38,17 +38,17 @@ const AddSubCategoryController = async(request,response)=>{
     }
 }
 
-const getSubCategoryController = async(request,response)=>{
+const getSubCategoryController = async(req,res)=>{
     try {
         const data = await SubCategoryModel.find().sort({createdAt : -1}).populate('category')
-        return response.json({
+        return res.json({
             message : "Sub Category data",
             data : data,
             error : false,
             success : true
         })
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -56,14 +56,14 @@ const getSubCategoryController = async(request,response)=>{
     }
 }
 
-const updateSubCategoryController = async(request,response)=>{
+const updateSubCategoryController = async(req,res)=>{
     try {
-        const { _id, name, image,category } = request.body 
+        const { _id, name, image,category } = req.body 
 
         const checkSub = await SubCategoryModel.findById(_id)
 
         if(!checkSub){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "Check your _id",
                 error : true,
                 success : false
@@ -76,7 +76,7 @@ const updateSubCategoryController = async(request,response)=>{
             category
         })
 
-        return response.json({
+        return res.json({
             message : 'Updated Successfully',
             data : updateSubCategory,
             error : false,
@@ -84,7 +84,7 @@ const updateSubCategoryController = async(request,response)=>{
         })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false 
@@ -92,20 +92,20 @@ const updateSubCategoryController = async(request,response)=>{
     }
 }
 
-const deleteSubCategoryController = async(request,response)=>{
+const deleteSubCategoryController = async(req,res)=>{
     try {
-        const { _id } = request.body 
+        const { _id } = req.body 
         console.log("Id",_id)
         const deleteSub = await SubCategoryModel.findByIdAndDelete(_id)
 
-        return response.json({
+        return res.json({
             message : "Delete successfully",
             data : deleteSub,
             error : false,
             success : true
         })
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false

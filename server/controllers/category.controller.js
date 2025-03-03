@@ -42,18 +42,18 @@ const SubCategoryModel = require("../models/subCategory.model")
 
 }
 /////////////////////////////////////////////////////////////////////
-const getCategoryController = async(request,response)=>{
+const getCategoryController = async(req,res)=>{
     try {
         
         const data = await CategoryModel.find().sort({ createdAt : -1 })
 
-        return response.json({
+        return res.json({
             data : data,
             error : false,
             success : true
         })
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.messsage || error,
             error : true,
             success : false
@@ -61,9 +61,9 @@ const getCategoryController = async(request,response)=>{
     }
 }
 /////////////////////////////////////////////////////////////////////
- const updateCategoryController = async(request,response)=>{
+ const updateCategoryController = async(req,res)=>{
     try {
-        const { _id ,name, image } = request.body 
+        const { _id ,name, image } = req.body 
 
         const update = await CategoryModel.updateOne({
             _id : _id
@@ -72,14 +72,14 @@ const getCategoryController = async(request,response)=>{
            image 
         })
 
-        return response.json({
+        return res.json({
             message : "Updated Category",
             success : true,
             error : false,
             data : update
         })
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -87,9 +87,9 @@ const getCategoryController = async(request,response)=>{
     }
 }
 /////////////////////////////////////////////////////////////////////
-const deleteCategoryController = async(request,response)=>{
+const deleteCategoryController = async(req,res)=>{
     try {
-        const { _id } = request.body 
+        const { _id } = req.body 
 
         const checkSubCategory = await SubCategoryModel.find({
             category : {
@@ -104,7 +104,7 @@ const deleteCategoryController = async(request,response)=>{
         }).countDocuments()
 
         if(checkSubCategory >  0 || checkProduct > 0 ){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "Category is already use can't delete",
                 error : true,
                 success : false
@@ -113,7 +113,7 @@ const deleteCategoryController = async(request,response)=>{
 
         const deleteCategory = await CategoryModel.deleteOne({ _id : _id})
 
-        return response.json({
+        return res.json({
             message : "Delete category successfully",
             data : deleteCategory,
             error : false,
@@ -121,7 +121,7 @@ const deleteCategoryController = async(request,response)=>{
         })
 
     } catch (error) {
-       return response.status(500).json({
+       return res.status(500).json({
             message : error.message || error,
             success : false,
             error : true

@@ -1,5 +1,5 @@
 const ProductModel = require("../models/product.model.js")
-const createProductController = async(request,response)=>{
+const createProductController = async(req,res)=>{
     try {
         const { 
             name ,
@@ -12,10 +12,10 @@ const createProductController = async(request,response)=>{
             discount,
             description,
             more_details,
-        } = request.body 
+        } = req.body 
 
         if(!name || !image[0] || !category[0] || !subCategory[0] || !unit || !price || !description ){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "Enter required fields",
                 error : true,
                 success : false
@@ -36,7 +36,7 @@ const createProductController = async(request,response)=>{
         })
         const saveProduct = await product.save()
 
-        return response.json({
+        return res.json({
             message : "Product Created Successfully",
             data : saveProduct,
             error : false,
@@ -44,7 +44,7 @@ const createProductController = async(request,response)=>{
         })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -52,10 +52,10 @@ const createProductController = async(request,response)=>{
     }
 }
 
-const getProductController = async(request,response)=>{
+const getProductController = async(req,res)=>{
     try {
         
-        let { page, limit, search } = request.body 
+        let { page, limit, search } = req.body 
 
         if(!page){
             page = 1
@@ -78,7 +78,7 @@ const getProductController = async(request,response)=>{
             ProductModel.countDocuments(query)
         ])
 
-        return response.json({
+        return res.json({
             message : "Product data",
             error : false,
             success : true,
@@ -87,7 +87,7 @@ const getProductController = async(request,response)=>{
             data : data
         })
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -95,12 +95,12 @@ const getProductController = async(request,response)=>{
     }
 }
 
-const getProductByCategory = async(request,response)=>{
+const getProductByCategory = async(req,res)=>{
     try {
-        const { id } = request.body 
+        const { id } = req.body 
 
         if(!id){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "provide category id",
                 error : true,
                 success : false
@@ -111,14 +111,14 @@ const getProductByCategory = async(request,response)=>{
             category : { $in : id }
         }).limit(15)
 
-        return response.json({
+        return res.json({
             message : "category product list",
             data : product,
             error : false,
             success : true
         })
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -126,12 +126,12 @@ const getProductByCategory = async(request,response)=>{
     }
 }
 
-const getProductByCategoryAndSubCategory  = async(request,response)=>{
+const getProductByCategoryAndSubCategory  = async(req,res)=>{
     try {
-        const { categoryId,subCategoryId,page,limit } = request.body
+        const { categoryId,subCategoryId,page,limit } = req.body
 
         if(!categoryId || !subCategoryId){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "Provide categoryId and subCategoryId",
                 error : true,
                 success : false
@@ -158,7 +158,7 @@ const getProductByCategoryAndSubCategory  = async(request,response)=>{
             ProductModel.countDocuments(query)
         ])
 
-        return response.json({
+        return res.json({
             message : "Product list",
             data : data,
             totalCount : dataCount,
@@ -169,21 +169,21 @@ const getProductByCategoryAndSubCategory  = async(request,response)=>{
         })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
         })
     }
 }
-const getProductDetails = async(request,response)=>{
+const getProductDetails = async(req,res)=>{
     try {
-        const { productId } = request.body 
+        const { productId } = req.body 
 
         const product = await ProductModel.findOne({ _id : productId })
 
 
-        return response.json({
+        return res.json({
             message : "product details",
             data : product,
             error : false,
@@ -191,7 +191,7 @@ const getProductDetails = async(request,response)=>{
         })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -199,12 +199,12 @@ const getProductDetails = async(request,response)=>{
     }
 }
 
-const updateProductDetails = async(request,response)=>{
+const updateProductDetails = async(req,res)=>{
     try {
-        const { _id } = request.body 
+        const { _id } = req.body 
 
         if(!_id){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "provide product _id",
                 error : true,
                 success : false
@@ -212,10 +212,10 @@ const updateProductDetails = async(request,response)=>{
         }
 
         const updateProduct = await ProductModel.updateOne({ _id : _id },{
-            ...request.body
+            ...req.body
         })
 
-        return response.json({
+        return res.json({
             message : "updated successfully",
             data : updateProduct,
             error : false,
@@ -223,7 +223,7 @@ const updateProductDetails = async(request,response)=>{
         })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -232,12 +232,12 @@ const updateProductDetails = async(request,response)=>{
 }
 
 //delete product
-const deleteProductDetails = async(request,response)=>{
+const deleteProductDetails = async(req,res)=>{
     try {
-        const { _id } = request.body 
+        const { _id } = req.body 
 
         if(!_id){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "provide _id ",
                 error : true,
                 success : false
@@ -246,14 +246,14 @@ const deleteProductDetails = async(request,response)=>{
 
         const deleteProduct = await ProductModel.deleteOne({_id : _id })
 
-        return response.json({
+        return res.json({
             message : "Delete successfully",
             error : false,
             success : true,
             data : deleteProduct
         })
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -262,9 +262,9 @@ const deleteProductDetails = async(request,response)=>{
 }
 
 //search product
-const searchProduct = async(request,response)=>{
+const searchProduct = async(req,res)=>{
     try {
-        let { search, page , limit } = request.body 
+        let { search, page , limit } = req.body 
 
         if(!page){
             page = 1
@@ -286,7 +286,7 @@ const searchProduct = async(request,response)=>{
             ProductModel.countDocuments(query)
         ])
 
-        return response.json({
+        return res.json({
             message : "Product data",
             error : false,
             success : true,
@@ -299,7 +299,7 @@ const searchProduct = async(request,response)=>{
 
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
