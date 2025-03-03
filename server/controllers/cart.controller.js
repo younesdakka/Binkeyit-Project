@@ -1,13 +1,13 @@
 const CartProductModel = require("../models/cartproduct.model.js");
 const UserModel = require("../models/user.model.js");
 
-const addToCartItemController = async(request,response)=>{
+const addToCartItemController = async(req,res)=>{
     try {
-        const  userId = request.userId
-        const { productId } = request.body
+        const  userId = req.userId
+        const { productId } = req.body
         
         if(!productId){
-            return response.status(402).json({
+            return res.status(402).json({
                 message : "Provide productId",
                 error : true,
                 success : false
@@ -20,7 +20,7 @@ const addToCartItemController = async(request,response)=>{
         })
 
         if(checkItemCart){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "Item already in cart"
             })
         }
@@ -38,7 +38,7 @@ const addToCartItemController = async(request,response)=>{
             }
         })
 
-        return response.json({
+        return res.json({
             data : save,
             message : "Item add successfully",
             error : false,
@@ -47,7 +47,7 @@ const addToCartItemController = async(request,response)=>{
 
         
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -55,22 +55,22 @@ const addToCartItemController = async(request,response)=>{
     }
 }
 
-const getCartItemController = async(request,response)=>{
+const getCartItemController = async(req,res)=>{
     try {
-        const userId = request.userId
+        const userId = req.userId
 
         const cartItem =  await CartProductModel.find({
             userId : userId
         }).populate('productId')
 
-        return response.json({
+        return res.json({
             data : cartItem,
             error : false,
             success : true
         })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -78,13 +78,13 @@ const getCartItemController = async(request,response)=>{
     }
 }
 
-const updateCartItemQtyController = async(request,response)=>{
+const updateCartItemQtyController = async(req,res)=>{
     try {
-        const userId = request.userId 
-        const { _id,qty } = request.body
+        const userId = req.userId 
+        const { _id,qty } = req.body
 
         if(!_id ||  !qty){
-            return response.status(400).json({
+            return res.status(400).json({
                 message : "provide _id, qty"
             })
         }
@@ -96,7 +96,7 @@ const updateCartItemQtyController = async(request,response)=>{
             quantity : qty
         })
 
-        return response.json({
+        return res.json({
             message : "Update cart",
             success : true,
             error : false, 
@@ -104,7 +104,7 @@ const updateCartItemQtyController = async(request,response)=>{
         })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false
@@ -112,13 +112,13 @@ const updateCartItemQtyController = async(request,response)=>{
     }
 }
 
-const deleteCartItemQtyController = async(request,response)=>{
+const deleteCartItemQtyController = async(req,res)=>{
     try {
-      const userId = request.userId // middleware
-      const { _id } = request.body 
+      const userId = req.userId // middleware
+      const { _id } = req.body 
       
       if(!_id){
-        return response.status(400).json({
+        return res.status(400).json({
             message : "Provide _id",
             error : true,
             success : false
@@ -127,7 +127,7 @@ const deleteCartItemQtyController = async(request,response)=>{
 
       const deleteCartItem  = await CartProductModel.deleteOne({_id : _id, userId : userId })
 
-      return response.json({
+      return res.json({
         message : "Item remove",
         error : false,
         success : true,
@@ -135,7 +135,7 @@ const deleteCartItemQtyController = async(request,response)=>{
       })
 
     } catch (error) {
-        return response.status(500).json({
+        return res.status(500).json({
             message : error.message || error,
             error : true,
             success : false

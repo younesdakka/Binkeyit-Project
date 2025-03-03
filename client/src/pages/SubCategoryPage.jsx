@@ -76,7 +76,7 @@ const SubCategoryPage = () => {
         return(
           <>
             {
-              row.original.category.map((c,index)=>{
+              row.original.category.map((c)=>{
                 return(
                   <p key={c._id+"table"} className='shadow-md px-1 inline-block'>{c.name}</p>
                 )
